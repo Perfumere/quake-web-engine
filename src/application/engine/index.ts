@@ -8,7 +8,7 @@ import {
     _SubmitDrawTask
 } from './stage/init';
 import { createGPUBuffer, engineCache } from './stage/runtime';
-import { runtime, mixinData, AutoTaskQueue, Unique } from '../utils';
+import { runtimeAsync, mixinData, AutoTaskQueue, Unique } from '../utils';
 import {
     defaultInitEngineOptions,
     defaultRenderPassOptions
@@ -28,7 +28,7 @@ export class EngineBase implements EngineBaseCtor {
         this.__engineReadyState = EngineReadyState.INIT;
         this.#options = mixinData(defaultInitEngineOptions(), options);
 
-        runtime(async () => {
+        runtimeAsync(async () => {
             const canvas = _CreateCanvas(this.#options.canvasOptions);
             this.#context = canvas.getContext('webgpu');
             this.#adapter = await navigator.gpu.requestAdapter(this.#options.requestAdapterOptions);

@@ -15,5 +15,5 @@ export {
     pureData,
     default as Util
 } from './process';
-export { runtime, animate } from './runtime';
+export { runtime, runtimeAsync, animate } from './runtime';
 export { Unique } from './unique';

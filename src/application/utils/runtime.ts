@@ -24,12 +24,42 @@ const context: Window = (() => {
 }
 )();
 
+/********************** runtime status start ***************************/
+let runtimeEventBindStatus = false;
+const tempTaskQueue: Function[] = [];
+
 /**
- * 传入一个函子, 在DOM加载完成后执行 
+ * 传入一个函子, 在DOM加载完成后顺序执行 
  * @param fn 函子
  */
-let runtimeEventBindStatus = false;
 export const runtime = (fn: Function) => {
+    if (
+        'document' in context
+        && ['interactive', 'complete'].includes(document.readyState?.toLowerCase())
+    ) {
+        AutoTaskQueue.set(Symbol.for('__RUNTIME_TASK__'), [fn], false);
+    }
+    else if ('addEventListener' in context) {
+        if (!runtimeEventBindStatus) {
+            runtimeEventBindStatus = true;
+            context.addEventListener('DOMContentLoaded', () => {
+                if (AutoTaskQueue.has(Symbol.for('__RUNTIME_TASK__'))) {
+                    AutoTaskQueue.get(Symbol.for('__RUNTIME_TASK__')).start();
+                }
+
+                tempTaskQueue.forEach(fn => { fn(); });
+            });
+        }
+
+        AutoTaskQueue.set(Symbol.for('__RUNTIME_TASK__'), [fn]);
+    }
+};
+
+/**
+ * 传入一个函子, 在DOM加载完成后异步执行 
+ * @param fn 函子
+ */
+export const runtimeAsync = (fn: Function) => {
     if (
         'document' in context
         && ['interactive', 'complete'].includes(document.readyState?.toLowerCase())
@@ -43,12 +73,16 @@ export const runtime = (fn: Function) => {
                 if (AutoTaskQueue.has(Symbol.for('__RUNTIME_TASK__'))) {
                     AutoTaskQueue.get(Symbol.for('__RUNTIME_TASK__')).start();
                 }
+
+                tempTaskQueue.forEach(fn => { fn(); });
             });
         }
 
-        AutoTaskQueue.set(Symbol.for('__RUNTIME_TASK__'), [fn]);
+        tempTaskQueue.push(fn);
     }
 };
+/********************** runtime status end ***************************/
+
 
 /**
  * 60+FPS动画
