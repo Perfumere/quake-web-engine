@@ -1,0 +1,25 @@
+{
+    "name": "pl-engine",
+    "version": "1.0.0",
+    "description": "a primitive rendering engine of Philuo",
+    "main": "build/electron/main.js",
+    "scripts": {
+        "dev": "vite -c ./configs/vite.config.ts --host",
+        "build": "vite -c ./configs/vite.config.ts build",
+        "dev:electron": "node ./scripts/electron-watch.mjs src/electron"
+    },
+    "keywords": [],
+    "author": "Perfumere<1061393710@qq.com>",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "16",
+        "@webgpu/types": "^0.1.9",
+        "gl-matrix": "^3.4.3",
+        "nanoid": "^3.1.30",
+        "vite": "^2.7.10"
+    },
+    "dependencies": {
+        "electron": "18.0.0-nightly.20220119"
+    },
+    "env": {}
+}

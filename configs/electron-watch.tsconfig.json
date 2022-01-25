@@ -1,0 +1,26 @@
+{
+    "include": ["../src/electron", "../@types"],
+    "compilerOptions": {
+        "outDir": "../build/electron",
+        "module": "commonjs",
+        "target": "ESNEXT",
+        "lib": [
+            "DOM",
+            "ESNEXT"
+        ],
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "types": [ "electron" ],
+        "allowJs": true,
+        "checkJs": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "incremental": true
+    }
+}

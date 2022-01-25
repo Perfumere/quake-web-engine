@@ -1,0 +1,22 @@
+{
+  "include": [ "src/application", "@types" ],
+  "compilerOptions": {
+    "target": "ESNEXT",                                               /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "lib": ["DOM", "ESNEXT"],                                         /* Specify a set of bundled library declaration files that describe the target runtime environment. */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": [ "@webgpu/types" ],                                     /* Specify type package names to be included without being referenced in a source file. */
+    "allowJs": true,                                                  /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
+    "checkJs": true,                                                  /* Enable error reporting in type-checked JavaScript files. */
+    "moduleResolution": "node",
+    "esModuleInterop": true,                                          /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */
+    "strict": true,                                                   /* Enable all strict type-checking options. */
+    "strictNullChecks": false,
+    "suppressImplicitAnyIndexErrors": true,                           /* When type checking, take into account `null` and `undefined`. */
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "incremental": true,
+    "experimentalDecorators": true                                    /* Enable experimental support for TC39 stage 2 draft decorators. */
+  }
+}
