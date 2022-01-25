@@ -3,6 +3,7 @@
  * @author Perfumere
  * @date   2022-01-01
  */
+import { AutoTaskQueue } from "./task";
 
 /**
  * 获取浏览器运行时
@@ -27,6 +28,7 @@ const context: Window = (() => {
  * 传入一个函子, 在DOM加载完成后执行 
  * @param fn 函子
  */
+let runtimeEventBindStatus = false;
 export const runtime = (fn: Function) => {
     if (
         'document' in context
@@ -35,9 +37,16 @@ export const runtime = (fn: Function) => {
         fn && fn();
     }
     else if ('addEventListener' in context) {
-        context.addEventListener('DOMContentLoaded', () => {
-            fn && fn();
-        });
+        if (!runtimeEventBindStatus) {
+            runtimeEventBindStatus = true;
+            context.addEventListener('DOMContentLoaded', () => {
+                if (AutoTaskQueue.has(Symbol.for('__RUNTIME_TASK__'))) {
+                    AutoTaskQueue.get(Symbol.for('__RUNTIME_TASK__')).start();
+                }
+            });
+        }
+
+        AutoTaskQueue.set(Symbol.for('__RUNTIME_TASK__'), [fn]);
     }
 };
 
