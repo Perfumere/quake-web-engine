@@ -23,7 +23,7 @@ export class EngineBase implements EngineBaseCtor {
     #device: GPUDevice;
     #format: GPUTextureFormat;
 
-    constructor (options: EnginInitOptions, tag?: string) {
+    constructor(options: EnginInitOptions, tag?: string) {
         this.__engineTag = tag;
         this.__engineReadyState = EngineReadyState.INIT;
         this.#options = mixinData(defaultInitEngineOptions(), options);
