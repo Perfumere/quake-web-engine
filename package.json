@@ -1,5 +1,5 @@
 {
-    "name": "pl-engine",
+    "name": "quake-web-engine",
     "version": "1.0.0",
     "description": "a primitive rendering engine of Philuo",
     "main": "build/electron/main.js",
