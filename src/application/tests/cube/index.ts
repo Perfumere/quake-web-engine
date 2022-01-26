@@ -113,7 +113,7 @@ CreateTransforms(
     [0.8, 0.8, 0.8]
 );
 const vpMatrix = CreateViewProjection().viewProjectionMatrix;
-mat4.multiply(vpMatrix, vpMatrix ,modelMatrix);
+mat4.multiply(vpMatrix, vpMatrix, modelMatrix);
 
 export default {
     vertex: {

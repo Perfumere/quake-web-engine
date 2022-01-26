@@ -47,7 +47,13 @@ export const runtime = (fn: Function) => {
                     AutoTaskQueue.get(Symbol.for('__RUNTIME_TASK__')).start();
                 }
 
-                tempTaskQueue.forEach(fn => { fn(); });
+                for (let i = 0; i < tempTaskQueue.length; ++i) {
+                    const func = tempTaskQueue.shift();
+
+                    if (typeof func === 'function') {
+                        func();
+                    }
+                }
             });
         }
 
@@ -74,7 +80,13 @@ export const runtimeAsync = (fn: Function) => {
                     AutoTaskQueue.get(Symbol.for('__RUNTIME_TASK__')).start();
                 }
 
-                tempTaskQueue.forEach(fn => { fn(); });
+                for (let i = 0; i < tempTaskQueue.length; ++i) {
+                    const func = tempTaskQueue.shift();
+
+                    if (typeof func === 'function') {
+                        func();
+                    }
+                }
             });
         }
 
