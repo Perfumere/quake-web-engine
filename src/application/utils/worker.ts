@@ -58,6 +58,15 @@ export class WorkerCtrl {
     }
 
     /**
+     * 通知线程
+     * @param message  需要传递的数据
+     * @param transfer 可按引用传递的数据列表
+     */
+    postMessage(message: any, transfer: Transferable[]) {
+        workerPoll.get(this.#addr).postMessage(message, transfer);
+    }
+
+    /**
      * 为线程添加监听事件
      * @param type 事件名称
      * @param listener 事件处理器
