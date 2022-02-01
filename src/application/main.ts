@@ -1,28 +1,17 @@
 import { draw } from './tests';
-// import { WorkerCtrl } from './utils/worker';
+import { Engine } from './engine';
+import test from '@/assets/images/brick.png';
 
-// const worker = new WorkerCtrl(() => {
-//     addEventListener('message', ({ data }) => {
-//         console.log(data);
-//     });
+const engine = new Engine({
+    canvasOptions: {
+        width: 400,
+        height: 400,
+        style: {
+            boxShadow: '1px 2px 20px #eee'
+        }
+    }
+});
 
-//     postMessage(Date.now());
-//     setTimeout(() => {
-//         close()
-//     }, 2000)
-// });
-
-// worker.onmessage = function({ data }) {
-//     console.log(data)
-// }
-
-// worker.onerror = function(event) {
-//     console.log('error', event);
-// }
-
-// worker.addEventListener('message', ({ data }) => {
-//     console.log(data, Date.now() - data)
-// })
-
+engine.createImageTexture(test);
 
 draw('cube');

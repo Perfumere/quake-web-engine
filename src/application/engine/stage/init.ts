@@ -5,6 +5,8 @@
  * @date   2022-01-01
  */
 
+import { IdxDB } from '@/application/utils/db';
+
 /**
  * 创建画布
  */
@@ -37,10 +39,74 @@ export const _CreateCanvas = (options: CanvasInitOptions = {}) => {
 };
 
 /**
+ * 初始化数据库
+ */
+export const _CreateDatabase = () => {
+    const DATABASE_LABEL = 'QUAKE_WEB_ENGINE';
+    const DATABASE_VERSION = 1;
+
+    const idxDb = new IdxDB(DATABASE_LABEL, DATABASE_VERSION);
+
+    // 纹理存储
+    idxDb.createStore(
+        'Texture',
+        { keyPath: 'name' },
+        [
+            {
+                name: 'version',
+                keyPath: 'version',
+                unique: true
+            }
+        ]
+    );
+
+    // 模型存储
+    idxDb.createStore(
+        'Model',
+        { keyPath: 'name' },
+        [
+            {
+                name: 'version',
+                keyPath: 'version',
+                unique: true
+            }
+        ]
+    );
+
+    // 顶点存储
+    idxDb.createStore(
+        'Vertex',
+        { keyPath: 'name' },
+        [
+            {
+                name: 'version',
+                keyPath: 'version',
+                unique: true
+            }
+        ]
+    );
+
+    // 片元存储
+    idxDb.createStore(
+        'Fragment',
+        { keyPath: 'name' },
+        [
+            {
+                name: 'version',
+                keyPath: 'version',
+                unique: true
+            }
+        ]
+    );
+
+    return idxDb;
+};
+
+/**
  * 初始化渲染通道
  */
 export const _InitRenderPass = (engine: EngineBaseCtor, renderPassOptions: RenderPassOptions) => {
-    const commandEncoder = engine.createCommandEncoder();
+    const commandEncoder = engine.getDevice().createCommandEncoder();
     const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments: [
             {
@@ -52,8 +118,14 @@ export const _InitRenderPass = (engine: EngineBaseCtor, renderPassOptions: Rende
     };
 
     if (renderPassOptions.useDepth) {
+        const { canvasOptions } = engine.getOptions();
+
         renderPassDescriptor.depthStencilAttachment = {
-            view: engine.createTexture(),
+            view: engine.getDevice().createTexture({
+                size: [canvasOptions.width, canvasOptions.height],
+                format: 'depth24plus',
+                usage: GPUTextureUsage.RENDER_ATTACHMENT
+            }).createView(),
             ...renderPassOptions.depth
         };
     }
@@ -137,7 +209,7 @@ export const _CreateBindLayout = (engine: EngineBaseCtor, options: RenderPassOpt
         }))
     });
     const layout = engine.getDevice().createPipelineLayout({
-        bindGroupLayouts: [ uniformGroupLayout ]
+        bindGroupLayouts: [uniformGroupLayout]
     });
 
     return { layout, uniformGroupLayout }
@@ -208,5 +280,5 @@ export const _SubmitDrawTask = (
 ) => {
     render.renderPassEncoder[drawer.name](drawer.count, 1, 0, 0);
     render.renderPassEncoder.endPass();
-    engine.getDevice().queue.submit([ render.commandEncoder.finish() ]);
+    engine.getDevice().queue.submit([render.commandEncoder.finish()]);
 };

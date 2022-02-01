@@ -56,14 +56,13 @@ interface EngineBaseCtor {
     __engineReadyState: number;
 
     getOptions: () => EnginInitOptions;
+    getDataBase: () => IdxDBCtor;
     createBuffer: (mappedArray: TypedArray, options: BufferUsageOptions) => void;
     getContext: () => GPUCanvasContext;
     getAdapter: () => GPUAdapter;
     getDevice: () => GPUDevice;
     getFormat: () => GPUTextureFormat;
     getCurrentView: () => GPUTextureView;
-    createTexture: () => GPUTextureView;
-    createCommandEncoder: () => GPUCommandEncoder;
     drawFrame: (options: DrawFrameOptions) => void;
 }
 

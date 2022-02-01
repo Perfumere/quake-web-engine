@@ -5,7 +5,8 @@ import {
     _InitRenderPass,
     _InitPipeline,
     _InitGPUBuffer,
-    _SubmitDrawTask
+    _SubmitDrawTask,
+    _CreateDatabase
 } from './stage/init';
 import { createGPUBuffer, engineCache } from './stage/runtime';
 import { runtimeAsync, mixinData, AutoTaskQueue, Unique } from '../utils';
@@ -22,11 +23,13 @@ export class EngineBase implements EngineBaseCtor {
     #adapter: GPUAdapter;
     #device: GPUDevice;
     #format: GPUTextureFormat;
+    #db: IdxDBCtor;
 
     constructor(options: EnginInitOptions, tag?: string) {
         this.__engineTag = tag;
         this.__engineReadyState = EngineReadyState.INIT;
         this.#options = mixinData(defaultInitEngineOptions(), options);
+        this.#db = _CreateDatabase();
 
         runtimeAsync(async () => {
             const canvas = _CreateCanvas(this.#options.canvasOptions);
@@ -45,6 +48,10 @@ export class EngineBase implements EngineBaseCtor {
                 AutoTaskQueue.get(this.__engineTag).start();
             }
         });
+    }
+
+    getDataBase() {
+        return this.#db;
     }
 
     getOptions() {
@@ -69,20 +76,6 @@ export class EngineBase implements EngineBaseCtor {
 
     getCurrentView() {
         return this.#context.getCurrentTexture().createView();
-    }
-
-    createTexture() {
-        const canvasOptions = this.#options.canvasOptions;
-
-        return this.#device.createTexture({
-            size: [canvasOptions.width, canvasOptions.height, 1],
-            format: "depth24plus",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT
-        }).createView();
-    }
-
-    createCommandEncoder() {
-        return this.#device.createCommandEncoder();
     }
 
     createBuffer(mappedArray: TypedArray, options: BufferUsageOptions) {
@@ -120,6 +113,51 @@ export class Engine implements EngineCtor {
      */
     getInstance() {
         return engineCache[this.__engineTag];
+    }
+
+    /**
+     * 创建图像纹理
+     */
+    createTextureFromSource(device: GPUDevice, source: ImageBitmap | HTMLCanvasElement) {
+        const textureDescriptor: GPUTextureDescriptor = {
+
+            // also [ width, height ],
+            size: { width: source.width, height: source.height },
+
+            // also canvas.getContext('webgpu').getPreferredFormat(adapter),
+            format: 'rgba8unorm',
+            usage: GPUTextureUsage.TEXTURE_BINDING
+                | GPUTextureUsage.COPY_DST
+                | GPUTextureUsage.RENDER_ATTACHMENT
+        };
+
+        const texture = device.createTexture(textureDescriptor);
+
+        device.queue.copyExternalImageToTexture({ source }, { texture }, textureDescriptor.size);
+
+        return texture;
+    }
+
+    async createImageTexture(url: string) {
+        const database = engineCache[this.__engineTag].getDataBase();
+        const cacheBlob = await database.findById('Texture', url);
+        let blob: Blob;
+
+        if (cacheBlob && typeof cacheBlob === 'object') {
+            blob = cacheBlob.blob;
+        }
+        else {
+            const response = await fetch(url);
+            blob = await response.blob();
+            database.store('Texture', { name: url, version: 1, blob });
+        }
+
+        const imgBitmap = await createImageBitmap(blob);
+
+        return this.createTextureFromSource(
+            engineCache[this.__engineTag].getDevice(),
+            imgBitmap
+        );
     }
 
     /**
